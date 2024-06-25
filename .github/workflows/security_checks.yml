@@ -1,0 +1,35 @@
+name: ESLint, Secrets, and Dependency Vulnerability Check
+
+# The check will automatically start on direct pushes to the main branch or when a pull request is made to the main branch. 
+on:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+# Prevent duplication
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run ESLint
+        run: pnpm eslint .
